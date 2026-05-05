@@ -151,6 +151,30 @@ del backend\db\recon.sqlite
 cd backend ; npm run db:init
 ```
 
+## Deployment
+
+The frontend is a Vite SPA that builds to static files; the backend is a long-running Node process with SQLite + an in-process worker. They go on different hosts.
+
+### Backend → Railway
+
+1. https://railway.app/new → "Deploy from GitHub repo" → pick `reconciliation-software`.
+2. **Service settings → Root Directory** = `backend`.
+3. **Variables** — add at minimum:
+   - `DB_FILE=/data/recon.sqlite`
+   - (anything else from `backend/.env.example` you want to override)
+4. **Volumes → New Volume** → mount path `/data`. SQLite needs persistent disk; Railway's ephemeral filesystem will lose data otherwise.
+5. Deploy. Railway builds with nixpacks, runs `npm start`. The DB auto-bootstraps on first boot.
+6. Note the public URL Railway gives you (e.g. `https://reconciliation-software-production.up.railway.app`).
+
+### Frontend → Vercel
+
+1. https://vercel.com/new → "Import Git Repository" → pick `reconciliation-software`.
+2. **Root Directory** = `frontend`. Vercel detects Vite automatically.
+3. **Environment Variables** → add `VITE_API_URL=https://<your-railway-url>/api`.
+4. Deploy. Vercel runs `npm run build`, serves `dist/` from its CDN.
+
+After both are live, the Vercel-hosted dashboard talks directly to Railway's backend. CORS is permissive (`cors()` middleware accepts any origin) — tighten to your Vercel domain in `backend/server.js` for production.
+
 ## Configuration
 All in `backend/.env`:
 

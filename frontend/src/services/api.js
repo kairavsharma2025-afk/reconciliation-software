@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// In local dev, leave VITE_API_URL unset → axios hits /api → Vite proxy
+// forwards to localhost:4000. In production (Vercel build), set
+// VITE_API_URL=https://your-backend-host.example.com/api so the static
+// bundle calls the deployed backend directly.
+const baseURL = import.meta.env.VITE_API_URL || '/api';
+const api = axios.create({ baseURL });
 
 export const uploadFiles = (files) => {
   const form = new FormData();
@@ -25,7 +30,7 @@ export const listJobs        = (params) => api.get('/jobs', { params });
 export const listRuns        = ()       => api.get('/reports/runs');
 export const getRun          = (id)     => api.get(`/reports/runs/${id}`);
 export const getRunRows      = (id, params) => api.get(`/reports/runs/${id}/rows`, { params });
-export const runCsvUrl       = (id)     => `/api/reports/runs/${id}/csv`;
+export const runCsvUrl       = (id)     => `${baseURL}/reports/runs/${id}/csv`;
 
 // Audit
 export const listAudit       = (params) => api.get('/audit', { params });
