@@ -2,6 +2,8 @@
 
 Reconciles transactions across **bank statements**, **payment gateway** exports, and the **internal ledger** — with audit trails, async job processing, retries, and historical reporting.
 
+![Dashboard](docs/dashboard.png)
+
 ```
 reconciliation-system/
 ├── backend/                          Node + Express + SQLite (node:sqlite)
